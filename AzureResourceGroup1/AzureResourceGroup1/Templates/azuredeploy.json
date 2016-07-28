@@ -1,0 +1,204 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachines_EYDevOp_adminPassword": {
+      "defaultValue": null,
+      "type": "SecureString"
+    },
+    "virtualMachines_EYDevOp_name": {
+      "defaultValue": "EYDevOp",
+      "type": "String"
+    },
+    "networkInterfaces_eydevop480_name": {
+      "defaultValue": "eydevop480",
+      "type": "String"
+    },
+    "networkSecurityGroups_EYDevOp_name": {
+      "defaultValue": "EYDevOp",
+      "type": "String"
+    },
+    "publicIPAddresses_EYDevOp_name": {
+      "defaultValue": "EYDevOp",
+      "type": "String"
+    },
+    "virtualNetworks_EYTest_name": {
+      "defaultValue": "EYTest",
+      "type": "String"
+    },
+    "storageAccounts_eytest3688_name": {
+      "defaultValue": "eytest3688",
+      "type": "String"
+    }
+  },
+  "variables": { },
+  "resources": [
+    {
+      "comments": "Generalized from resource: '/subscriptions/91fbce53-671e-4e27-90e6-9091d6dc7b05/resourceGroups/EYTest/providers/Microsoft.Compute/virtualMachines/EYDevOp'.",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('virtualMachines_EYDevOp_name')]",
+      "apiVersion": "2015-06-15",
+      "location": "southcentralus",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_D2"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftVisualStudio",
+            "offer": "VisualStudio",
+            "sku": "VS-2015-Ent-VSU3-AzureSDK-291-WS2012R2",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[parameters('virtualMachines_EYDevOp_name')]",
+            "createOption": "FromImage",
+            "vhd": {
+              "uri": "[concat('https', '://', parameters('storageAccounts_eytest3688_name'), '.blob.core.windows.net', concat('/vhds/', parameters('virtualMachines_EYDevOp_name'),'2016628162312.vhd'))]"
+            },
+            "caching": "ReadWrite"
+          },
+          "dataDisks": [ ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_EYDevOp_name')]",
+          "adminUsername": "EYUser",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          },
+          "secrets": [ ],
+          "adminPassword": "[parameters('virtualMachines_EYDevOp_adminPassword')]"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_eydevop480_name'))]"
+            }
+          ]
+        }
+      },
+      "resources": [ ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_eytest3688_name'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_eydevop480_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/91fbce53-671e-4e27-90e6-9091d6dc7b05/resourceGroups/EYTest/providers/Microsoft.Network/networkInterfaces/eydevop480'.",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('networkInterfaces_eydevop480_name')]",
+      "apiVersion": "2016-03-30",
+      "location": "southcentralus",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAddress": "10.0.0.4",
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_EYDevOp_name'))]"
+              },
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_EYTest_name')), '/subnets/default')]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [ ]
+        },
+        "enableIPForwarding": false,
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_EYDevOp_name'))]"
+        }
+      },
+      "resources": [ ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_EYDevOp_name'))]",
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_EYTest_name'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_EYDevOp_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/91fbce53-671e-4e27-90e6-9091d6dc7b05/resourceGroups/EYTest/providers/Microsoft.Network/networkSecurityGroups/EYDevOp'.",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('networkSecurityGroups_EYDevOp_name')]",
+      "apiVersion": "2016-03-30",
+      "location": "southcentralus",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "default-allow-rdp",
+            "properties": {
+              "protocol": "*",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      },
+      "resources": [ ],
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/91fbce53-671e-4e27-90e6-9091d6dc7b05/resourceGroups/EYTest/providers/Microsoft.Network/publicIPAddresses/EYDevOp'.",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('publicIPAddresses_EYDevOp_name')]",
+      "apiVersion": "2016-03-30",
+      "location": "southcentralus",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "idleTimeoutInMinutes": 4
+      },
+      "resources": [ ],
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/91fbce53-671e-4e27-90e6-9091d6dc7b05/resourceGroups/EYTest/providers/Microsoft.Network/virtualNetworks/EYTest'.",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworks_EYTest_name')]",
+      "apiVersion": "2016-03-30",
+      "location": "southcentralus",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "default",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24"
+            }
+          }
+        ]
+      },
+      "resources": [ ],
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/91fbce53-671e-4e27-90e6-9091d6dc7b05/resourceGroups/eytest/providers/Microsoft.Storage/storageAccounts/eytest3688'.",
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "name": "[parameters('storageAccounts_eytest3688_name')]",
+      "apiVersion": "2016-01-01",
+      "location": "southcentralus",
+      "tags": { },
+      "properties": { },
+      "resources": [ ],
+      "dependsOn": [ ]
+    }
+  ]
+}
